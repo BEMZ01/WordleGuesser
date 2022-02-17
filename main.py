@@ -9,6 +9,7 @@ def ai(word_list, previous_words=None):
         return random.choice(word_list[random.randint(0, int(len(word_list)/2)):int(len(word_list))])
     return 0
 
+
 def get_score(word):
     score = 0
     for x in range(len(ALPHABET)):
@@ -66,7 +67,7 @@ while guesses != 6:
     print(history)
     print(correct_word)
     print("Guess " + str(guesses + 1) + "/6")
-    # fancy ml code
+    ai(sorted_list, history)
     inp = input("\n:> ").upper()  # replace with fancy ml code
     # end fancy ml code
     inputs.append(inp)
