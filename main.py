@@ -3,10 +3,51 @@ import re
 from pprint import pprint
 
 
-def ai(word_list, previous_words=None):
-    # using regular expressions, attempt to guess the word upon smart things
-    if previous_words == None:
+def ai(word_list, previous_words, previous_words_info=None):
+    # using computer magic and wizardry; make computer choose what the word is
+    doesnt_contain = []
+    yellow_contain = []
+    green_contain = []
+    try:
+        with open("storage/ai", "r") as file:
+            file = file.readlines()
+            doesnt_contain = file[0].replace("\n", "").split("|")
+            yellow_contain = file[1].replace("\n", "").split("|")
+            temp = file[2].replace("\n", "").split("|")
+            for x in range(len(temp)):
+                green_contain.append(temp[x].split("-"))
+    except IndexError:
+        pass
+
+    print(doesnt_contain, yellow_contain, green_contain)
+    if previous_words_info is None:
         return random.choice(word_list[random.randint(0, int(len(word_list)/2)):int(len(word_list))])
+    for x in range(len(previous_words_info)):
+        word = previous_words_info[x]
+        for y in range(len(word)):
+            if word[y] == "N":
+                if previous_words[x][y] not in doesnt_contain:
+                    doesnt_contain.append(previous_words[x][y])
+            elif word[y] == "Y":
+                if previous_words[x][y] not in yellow_contain:
+                    yellow_contain.append(previous_words[x][y])
+            elif word[y] == "G":
+                if previous_words[x][y] not in green_contain:
+                    green_contain.append([previous_words[x][y], y])
+
+
+
+
+    with open("storage/ai", "w") as file:
+        out = ""
+        for x in [doesnt_contain, yellow_contain]:
+            for word in x:
+                out = out+word+"|"
+            out = out.rstrip(out[-1])+"\n"
+        for word in green_contain:
+            out = out + str(word[0]) + "-" + str(word[1]) + "|"
+        out = out.rstrip(out[-1]) + "\n"
+        file.write(out)
     return 0
 
 
@@ -44,6 +85,9 @@ ALPHABET = ["E", "T", "A", "O", "I", "N", "S", "R", "H", "D", "L", "U", "C", "M"
             "K", "X", "Q", "J", "Z"]
 score = []
 
+with open("storage/ai", "w+") as file:
+    pass
+
 with open("possible", "r") as file:
     file = file.readlines()
     for x in range(len(file)):
@@ -55,19 +99,17 @@ for x in range(len(file)):
         word_score += file[x].count(ALPHABET[y]) * (abs(y - 28))
         score[x] = word_score
 sorted_list = [x for _, x in sorted(zip(score, file), reverse=True)]
-print(sorted_list)
+
 print("Loaded words, total " + str(len(file)))
 print("\n")
 correct_word = random.choice(file)
-#print(correct_word)
+print(correct_word)
 guesses = 0
 inputs = []
 while guesses != 6:
     history = display(inputs, correct_word)
-    print(history)
-    print(correct_word)
     print("Guess " + str(guesses + 1) + "/6")
-    ai(sorted_list, history)
+    print("AI suggestion: "+str(ai(sorted_list, inputs, history)))
     inp = input("\n:> ").upper()  # replace with fancy ml code
     # end fancy ml code
     inputs.append(inp)
