@@ -32,7 +32,7 @@ def ai(word_list, previous_words, previous_words_info=None):
                 if previous_words[x][y] not in yellow_contain:
                     yellow_contain.append(previous_words[x][y])
             elif word[y] == "G":
-                if previous_words[x][y] not in green_contain:
+                if [previous_words[x][y], y] not in green_contain:
                     green_contain.append([previous_words[x][y], y])
 
 
